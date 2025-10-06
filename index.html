@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Medicamentos - FMMN</title>
+    <link rel="icon" type="image/png" href="icon.jpg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'azul-sereno': '#3E7BFA',
+                        'amarillo-esperanza': '#FFD700',
+                        'rosa-ternura': '#F55D9A',
+                        'naranja-vitalidad': '#FF8C00',
+                        'gris-oscuro': '#333333',
+                        'gris-suave': '#6c757d',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ffffff; /* Color ajustado para el botón naranja */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- ESTILOS MEJORADOS PARA IMPRESIÓN --- */
+        @media print {
+            /* Oculta la interfaz web por completo */
+            body > .flex {
+                display: none;
+            }
+            /* Solo muestra la sección de impresión */
+            #print-layout-table {
+                display: table !important; /* Asegura que la tabla de layout sea visible */
+            }
+
+            @page {
+                size: A4;
+                margin: 1.5cm;
+            }
+
+            body {
+                background-color: white !important;
+                font-family: 'Times New Roman', Times, serif; /* Fuente profesional para documentos */
+                font-size: 12pt;
+                line-height: 1; 
+            }
+            
+            /* Estilos para la tabla de maquetación de impresión */
+            #print-layout-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            #print-layout-table thead, #print-layout-table tfoot {
+                display: table-row-group; /* Comportamiento correcto para repetición */
+            }
+            #print-layout-table > thead > tr > td,
+            #print-layout-table > tfoot > tr > td {
+                border: none;
+                padding: 0;
+            }
+            
+            /* Estilos del contenido dentro de la maquetación */
+            #print-header h1 {
+                font-size: 18pt;
+                font-weight: bold;
+                color: #333;
+                margin: 0; 
+                padding: 0;
+            }
+            #print-header p {
+                 margin: 0; 
+                 padding: 0; 
+                 font-size: 12pt;
+            }
+            
+            #print-section h2 {
+                font-size: 14pt;
+                font-weight: bold;
+                color: #3E7BFA;
+                border-bottom: 2px solid #3E7BFA;
+                padding-bottom: 4px;
+                margin-top: 0.8rem;
+                margin-bottom: 0.8rem;
+            }
+
+            #print-info-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.3rem 1.5rem;
+            }
+            #print-info-grid div {
+                padding: 1.2px 0;
+            }
+            #print-info-grid strong {
+                color: #333;
+            }
+
+            #print-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 0.8rem;
+                font-size: 10pt;
+            }
+
+            #print-table th, #print-table td {
+                border: 1px solid #333 !important;
+                padding: 4px 5px;
+                text-align: left;
+            }
+
+            #print-table thead {
+                background-color: #e9ecef !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+
+            #print-footer {
+                width: 100%;
+                text-align: center; 
+                font-size: 10pt; 
+                color: #6c757d; 
+                border-top: 1px solid #ccc; 
+                padding-top: 0.5rem;
+                /* Altura necesaria para que el tfoot ocupe espacio y se repita */
+                height: 1cm;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gris-oscuro">
+
+    <div class="flex flex-col min-h-screen">
+        <header class="bg-white shadow-md p-4 flex items-center no-print">
+            <img src="logo.jpg" alt="Logo FMMN" class="h-12 w-12 rounded-full">
+            <div class="ml-4">
+                <h1 class="text-xl font-bold text-azul-sereno">Fundación María Madre de los Niños</h1>
+                <p class="text-sm text-gris-suave">Formulario de Registro de Medicamentos</p>
+            </div>
+        </header>
+
+        <main class="flex-grow container mx-auto p-4 md:p-6 no-print">
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <form id="form" name="form" class="space-y-6">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="nombre" class="block text-sm font-medium text-gris-oscuro mb-1">Nombre de beneficiaria(o)*</label>
+                            <input name="nombre" type="text" id="nombre" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-azul-sereno focus:border-azul-sereno" placeholder="Nombre completo" required>
+                        </div>
+                        <div>
+                            <label for="edad" class="block text-sm font-medium text-gris-oscuro mb-1">Edad *</label>
+                            <input name="edad" type="number" id="edad" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-azul-sereno focus:border-azul-sereno" placeholder="En años cumplidos: ej. 14" required>
+                        </div>
+                        <div>
+                            <label for="numId" class="block text-sm font-medium text-gris-oscuro mb-1">Número documento de identidad *</label>
+                            <input name="numId" type="number" id="numId" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-azul-sereno focus:border-azul-sereno" placeholder="1010123456" required>
+                        </div>
+                        <div>
+                            <label for="puntoAtencion" class="block text-sm font-medium text-gris-oscuro mb-1">IPS que emite fórmula *</label>
+                            <input name="puntoAtencion" type="text" id="puntoAtencion" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-azul-sereno focus:border-azul-sereno" placeholder="Nombre IPS" required>
+                        </div>
+                        <div>
+                            <label for="medicamento" class="block text-sm font-medium text-gris-oscuro mb-1">Nombre del medicamento *</label>
+                            <input name="medicamento" type="text" id="medicamento" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-azul-sereno focus:border-azul-sereno" placeholder="ej. Acetaminofen 500gr" required>
+                        </div>
+                        <div>
+                            <label for="presentacionMed" class="block text-sm font-medium text-gris-oscuro mb-1">Presentación medicamento *</label>
+                            <input name="presentacionMed" type="text" id="presentacionMed" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-azul-sereno focus:border-azul-sereno" placeholder="ej. jarabe, tableta, cápsula..." required>
+                        </div>
+                        <div>
+                            <label for="cantMed" class="block text-sm font-medium text-gris-oscuro mb-1">Cantidad medicamento por dosis *</label>
+                            <input name="cantMed" type="text" id="cantMed" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-azul-sereno focus:border-azul-sereno" placeholder="5cc, o solo el número para tabletas..." required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="fechaInicio" class="block text-sm font-medium text-gris-oscuro mb-1">Fecha de inicio *</label>
+                                <input name="fechaInicio" type="date" id="fechaInicio" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-azul-sereno focus:border-azul-sereno" required>
+                            </div>
+                            <div>
+                                <label for="tiempoInicio" class="block text-sm font-medium text-gris-oscuro mb-1">Hora de inicio *</label>
+                                <input name="tiempoInicio" type="time" id="tiempoInicio" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-azul-sereno focus:border-azul-sereno" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="dosis" class="block text-sm font-medium text-gris-oscuro mb-1">Número de dosis recibidas *</label>
+                            <input name="dosis" type="number" id="dosis" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-azul-sereno focus:border-azul-sereno" placeholder="Ej. 7, 10, 30" required>
+                        </div>
+                        <div>
+                            <label for="frecEntrega" class="block text-sm font-medium text-gris-oscuro mb-1">Frecuencia de entrega (horas)*</label>
+                            <input name="frecEntrega" type="number" id="frecEntrega" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-azul-sereno focus:border-azul-sereno" placeholder="Colocar el número de horas" required>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="observacion" class="block text-sm font-medium text-gris-oscuro mb-1">Observaciones</label>
+                        <textarea name="observacion" id="observacion" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-azul-sereno focus:border-azul-sereno" rows="4">Ninguna</textarea>
+                    </div>
+
+                    <div class="botones flex flex-wrap justify-center gap-4 pt-4 border-t">
+                        <button type="button" id="calc" class="flex items-center justify-center gap-2 bg-naranja-vitalidad text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-90 transition-all shadow-md w-40">
+                            <span class="btn-text"><i class="bx bxs-calculator"></i>Calcular y Enviar</span>
+                            <span class="loader hidden"></span>
+                        </button>
+                        <button type="button" id="clear" class="flex items-center gap-2 bg-rosa-ternura text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-90 transition-all shadow-md"><i class="bx bxs-eraser"></i>Limpiar</button>
+                        <button type="button" id="print" class="flex items-center gap-2 bg-gris-suave text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-80 transition-all shadow-md"><i class="bx bxs-printer"></i>Imprimir</button>
+                    </div>
+                </form>
+
+                <div id="tablaEntregasContainer" class="mt-8 hidden">
+                    <h3 class="text-lg font-bold text-azul-sereno mb-4">Cronograma de Entrega de Medicamentos</h3>
+                    <div class="overflow-x-auto">
+                        <table id="tablaEntregas" class="w-full text-sm text-left text-gris-oscuro">
+                            <thead class="text-xs text-gris-oscuro uppercase bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">Fecha de Entrega</th>
+                                    <th scope="col" class="px-6 py-3">Hora de Entrega</th>
+                                    <th scope="col" class="px-6 py-3">Recibe (Si/No)</th>
+                                    <th scope="col" class="px-6 py-3">Firma Enfermera</th>
+                                    <th scope="col" class="px-6 py-3">Firma Formador(a)</th>
+                                    <th scope="col" class="px-6 py-3">Firma Beneficiaria(o)</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="bg-white p-3 text-center text-sm text-gris-suave border-t no-print">
+            <strong>Sede:</strong> Finca San José, Vereda Fonqueta, Chía, Cundinamarca | <strong>Tel:</strong> 311 4584142
+        </footer>
+    </div>
+
+    <table id="print-layout-table" style="display: none;">
+        <thead>
+            <tr>
+                <td>
+                    <div id="print-header" style="display: flex; align-items: center; border-bottom: 2px solid #3E7BFA; padding-bottom: 1rem; margin-bottom: 1rem;">
+                        <img src="logo.jpg" alt="Logo FMMN" style="height: 60px; width: 60px; border-radius: 50%;">
+                        <div style="margin-left: 1rem;">
+                            <h1>Fundación María Madre de los Niños</h1>
+                            <p>Reporte de Entrega de Medicamentos</p>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div id="print-section">
+                        <section>
+                            <h2>Información del Registro</h2>
+                            <div id="print-info-grid">
+                                <div><strong>Beneficiaria(o):</strong> <span id="print-nombre"></span></div>
+                                <div><strong>Edad:</strong> <span id="print-edad"></span> años</div>
+                                <div><strong>Documento:</strong> <span id="print-numId"></span></div>
+                                <div><strong>IPS:</strong> <span id="print-puntoAtencion"></span></div>
+                                <div><strong>Medicamento:</strong> <span id="print-medicamento"></span></div>
+                                <div><strong>Presentación:</strong> <span id="print-presentacionMed"></span></div>
+                                <div><strong>Dosis:</strong> <span id="print-cantMed"></span></div>
+                                <div><strong>Frecuencia:</strong> Cada <span id="print-frecEntrega"></span> horas</div>
+                                <div><strong>Fecha Inicio:</strong> <span id="print-fechaInicio"></span></div>
+                                <div><strong>Hora Inicio:</strong> <span id="print-tiempoInicio"></span></div>
+                            </div>
+                            <div style="margin-top: 1rem;"><strong>Observaciones:</strong> <span id="print-observacion"></span></div>
+                        </section>
+
+                        <section>
+                            <h2>Cronograma de Entregas</h2>
+                            <table id="print-table">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha de Entrega</th>
+                                        <th>Hora de Entrega</th>
+                                        <th>Recibido</th>
+                                        <th>Firma Enfermera</th>
+                                        <th>Firma Formador(a)</th>
+                                        <th>Firma Beneficiaria(o)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="print-table-body"></tbody>
+                            </table>
+                        </section>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>
+                    <div id="print-footer">
+                        <strong>Sede:</strong> Finca San José, Vereda Fonqueta, Chía, Cundinamarca | <strong>Tel:</strong> 311 4584142
+                    </div>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzn7hw7NRUBuY8e_QssbqRokEJU3768hRuEE5g6B2dvCCw0nMz5I5hWFPPD2MdQbcnBvw/exec';
+
+        const form = document.getElementById('form');
+        const calcButton = document.getElementById('calc');
+        const clearButton = document.getElementById('clear');
+        const printButton = document.getElementById('print');
+        
+        // Elementos del botón de cálculo para manejar el estado de carga
+        const btnText = calcButton.querySelector('.btn-text');
+        const loader = calcButton.querySelector('.loader');
+        
+        calcButton.addEventListener('click', function calculateAndSend() {
+            // 1. Validar que los campos del formulario estén completos
+            if (!form.checkValidity()) {
+                alert('Por favor, completa todos los campos requeridos (*) antes de continuar.');
+                form.reportValidity();
+                return;
+            }
+
+            // --- INICIO: Lógica de cálculo del cronograma ---
+            const startDate = document.getElementById('fechaInicio').value;
+            const startTime = document.getElementById('tiempoInicio').value;
+            const numDoses = parseInt(document.getElementById('dosis').value, 10);
+            const deliveryFrequency = parseInt(document.getElementById('frecEntrega').value, 10);
+            let currentDate = new Date(startDate + 'T' + startTime);
+            const tableBody = document.querySelector('#tablaEntregas tbody');
+            tableBody.innerHTML = '';
+            for (let i = 0; i < numDoses; i++) {
+                const deliveryDate = currentDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+                const deliveryTime = currentDate.toLocaleTimeString('es-ES', { hour: 'numeric', minute: '2-digit', hour12: true }); // Cambio a fecha am / pm
+                const row = document.createElement('tr');
+                row.className = 'bg-white border-b';
+                row.innerHTML = `<td class="px-6 py-4">${deliveryDate}</td><td class="px-6 py-4">${deliveryTime}</td><td class="px-6 py-4"><input type="checkbox" class="w-4 h-4 text-azul-sereno bg-gray-100 border-gray-300 rounded focus:ring-azul-sereno"></td><td class="px-6 py-4 border-b-2 border-dotted border-gray-300"></td><td class="px-6 py-4 border-b-2 border-dotted border-gray-300"></td><td class="px-6 py-4 border-b-2 border-dotted border-gray-300"></td>`;
+                tableBody.appendChild(row);
+                currentDate.setTime(currentDate.getTime() + deliveryFrequency * 60 * 60 * 1000);
+            }
+            document.getElementById('tablaEntregasContainer').classList.remove('hidden');
+            // --- FIN: Lógica de cálculo del cronograma ---
+
+            // --- INICIO: Lógica de envío de datos a Google Sheets ---
+            if (SCRIPT_URL === 'URL_DE_TU_WEB_APP_AQUI') {
+                alert('ERROR: Debes configurar la URL de tu Web App en el archivo HTML.');
+                return;
+            }
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Cambiar estado del botón a "cargando"
+            btnText.classList.add('hidden');
+            loader.classList.remove('hidden');
+            calcButton.disabled = true;
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'cors',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(response => {
+                if(response.result === 'success'){
+                    alert('Cronograma calculado y registro enviado exitosamente.');
+                    // IMPORTANTE: No se limpia el formulario para permitir la impresión.
+                } else { 
+                    throw new Error(response.message || 'El script de Google devolvió un error desconocido.'); 
+                }
+            })
+            .catch(error => {
+                alert('Ocurrió un error al enviar el registro: ' + error.message);
+                console.error('Error:', error);
+            })
+            .finally(() => {
+                // Restaurar el estado del botón
+                btnText.classList.remove('hidden');
+                loader.classList.add('hidden');
+                calcButton.disabled = false;
+            });
+            // --- FIN: Lógica de envío de datos ---
+        });
+        
+        clearButton.addEventListener('click', function clearForm() {
+            form.reset();
+            document.querySelector('#tablaEntregas tbody').innerHTML = '';
+            document.getElementById('tablaEntregasContainer').classList.add('hidden');
+        });
+
+        printButton.addEventListener('click', function() {
+            // 1. Validar que el formulario y la tabla tengan datos
+            if (!form.checkValidity()) {
+                 alert('Por favor, completa todos los campos requeridos (*) antes de imprimir.');
+                 form.reportValidity();
+                 return;
+            }
+            if (document.querySelector('#tablaEntregas tbody').rows.length === 0) {
+                alert('Por favor, presiona "Calcular y Enviar" para generar el cronograma antes de imprimir.');
+                return;
+            }
+
+            // 2. Poblar la sección de impresión con los datos del formulario
+            document.getElementById('print-nombre').textContent = document.getElementById('nombre').value;
+            document.getElementById('print-edad').textContent = document.getElementById('edad').value;
+            document.getElementById('print-numId').textContent = document.getElementById('numId').value;
+            document.getElementById('print-puntoAtencion').textContent = document.getElementById('puntoAtencion').value;
+            document.getElementById('print-medicamento').textContent = document.getElementById('medicamento').value;
+            document.getElementById('print-presentacionMed').textContent = document.getElementById('presentacionMed').value;
+            document.getElementById('print-cantMed').textContent = document.getElementById('cantMed').value;
+            document.getElementById('print-frecEntrega').textContent = document.getElementById('frecEntrega').value;
+            document.getElementById('print-fechaInicio').textContent = new Date(document.getElementById('fechaInicio').value + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('print-tiempoInicio').textContent = document.getElementById('tiempoInicio').value;
+            document.getElementById('print-observacion').textContent = document.getElementById('observacion').value;
+
+            // 3. Clonar la tabla calculada a la sección de impresión
+            const printTableBody = document.getElementById('print-table-body');
+            printTableBody.innerHTML = ''; // Limpiar antes de poblar
+            
+            const originalRows = document.querySelectorAll('#tablaEntregas tbody tr');
+            originalRows.forEach(row => {
+                const newRow = printTableBody.insertRow();
+                newRow.insertCell(0).textContent = row.cells[0].textContent;
+                newRow.insertCell(1).textContent = row.cells[1].textContent;
+                newRow.insertCell(2).textContent = ''; // Espacio para recibido (Si/No) manual
+                newRow.insertCell(3).textContent = ''; // Espacio para firma
+                newRow.insertCell(4).textContent = ''; // Espacio para firma
+                newRow.insertCell(5).textContent = ''; // Espacio para firma
+            });
+            
+            // 4. Llamar a la función de impresión del navegador
+            window.print();
+        });
+
+    });
+</script>
+</body>
+</html>
